@@ -57,7 +57,7 @@ vector<Vertex> read_graph_data(string path)
             string s;
             while (getline(ss, s, ' '))
             {
-                vtxs[i].to[j].push_back(stoi(s));
+                vtxs[i].to[j].insert(stoi(s));
             }
         }
     }

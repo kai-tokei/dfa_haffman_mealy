@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <map>
 #include <set>
 
 #include "./vertex.cpp"
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
     }
     if (argc > 2)
     {
-        accepted_string = argv[2];
+        accepted_string = argv[3];
     }
 
     string dot_header = read_file(dot_header_path); // dotファイルのheader
@@ -50,12 +51,54 @@ int main(int argc, char *argv[])
     }
     dot_code += "\n    input -> q_0;\n";
 
+    map<string, set<int>> groups;            // 頂点のグループ
+    vector<string> group_table(vtxs.size()); // Vertexがどのグループに属しているかを表すテーブル
+
     // Q\F, Fで分類
-    set<string, Vertex> classes;
+    for (int i = 0; i < vtxs.size(); i++)
+    {
+        groups[to_string(vtxs[i].lambda == accepted_string)].insert(i);
+        group_table[i] = to_string(vtxs[i].lambda == accepted_string);
+    }
 
     // 分類先をナンバリング
     // それぞれのグループ内の要素の遷移先グループを確認
     // 異なる遷移先なら、別グループを作成し、分類
+    while (true)
+    {
+        map<string, set<int>> next_groups;            // 分類中のグループ
+        vector<string> next_group_table(vtxs.size()); // 頂点がどのグループに属すか記録するテーブル
+
+        for (const auto &g : groups)
+        {
+            // それぞれの頂点に関して、遷移先をグループのどれに該当するかを調べる
+            for (const int &v : g.second)
+            {
+                // 遷移先グループのidを結合して、文字列化する
+                string dist = "";
+                for (const set<int> &to : vtxs[v].to)
+                {
+                    for (const int &i : to)
+                    {
+                        dist += group_table[i];
+                    }
+                }
+                next_groups[dist].insert(v); // 該当のグループに頂点を登録
+                next_group_table[v] = dist;  // 登録した旨をtableに保存
+            }
+        }
+
+        if (next_groups.size() == groups.size())
+        {
+            // グループ数が変わっていないなら、終了
+            break;
+        }
+        else
+        {
+            groups = next_groups;
+            group_table = next_group_table;
+        }
+    }
 
     // 同じクラス内の要素をmerge
     // クラス番号で頂点tableを作成
