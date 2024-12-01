@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <set>
 
 #include "./vertex.cpp"
 #include "./utils.cpp"
@@ -13,7 +14,8 @@ const string dot_footer_path = "./dot_footer.txt";
 
 int main(int argc, char *argv[])
 {
-    string graph_data_path; // グラフデータのpath
+    string graph_data_path;       // グラフデータのpath
+    string accepted_string = "1"; // 受理文字列
 
     // グラフデータファイルのpathを読み込む
     if (argc > 1)
@@ -24,6 +26,10 @@ int main(int argc, char *argv[])
     {
         cerr << "Error: No graph data !!" << endl;
         return 0;
+    }
+    if (argc > 2)
+    {
+        accepted_string = argv[2];
     }
 
     string dot_header = read_file(dot_header_path); // dotファイルのheader
@@ -44,6 +50,16 @@ int main(int argc, char *argv[])
     }
     dot_code += "\n    input -> q_0;\n";
 
+    // Q\F, Fで分類
+    set<string, Vertex> classes;
+
+    // 分類先をナンバリング
+    // それぞれのグループ内の要素の遷移先グループを確認
+    // 異なる遷移先なら、別グループを作成し、分類
+
+    // 同じクラス内の要素をmerge
+    // クラス番号で頂点tableを作成
+
     // 頂点の接続関係をDotコードに変換
     dot_code += "\n";
     for (int i = 0; i < vtxs.size(); i++)
@@ -52,15 +68,6 @@ int main(int argc, char *argv[])
     }
 
     dot_code += dot_footer + "\n";
-
-    // Q\F, Fで分類
-
-    // 分類先をナンバリング
-    // それぞれのグループ内の要素の遷移先グループを確認
-    // 異なる遷移先なら、別グループを作成し、分類
-
-    // 同じクラス内の要素をmerge
-    // クラス番号で頂点tableを作成
 
     // Dotファイルを作成
     ofstream file("graph.dot");
