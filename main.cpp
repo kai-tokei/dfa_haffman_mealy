@@ -53,6 +53,15 @@ int main(int argc, char *argv[])
 
     dot_code += dot_footer + "\n";
 
+    // Q\F, Fで分類
+
+    // 分類先をナンバリング
+    // それぞれのグループ内の要素の遷移先グループを確認
+    // 異なる遷移先なら、別グループを作成し、分類
+
+    // 同じクラス内の要素をmerge
+    // クラス番号で頂点tableを作成
+
     // Dotファイルを作成
     ofstream file("graph.dot");
     file << dot_code;
